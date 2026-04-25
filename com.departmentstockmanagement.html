@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Computer Dept. Stock — Govt. Digvijay College</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:#0a1628; --navy-mid:#132040; --navy-light:#1e3060;
+    --gold:#c8962a; --gold-light:#e8b84b; --gold-pale:#f5e6c0;
+    --cream:#faf7f0; --white:#ffffff;
+    --text-dark:#1a1a2e; --text-mid:#3d4a6b; --text-muted:#7a8499;
+    --border:#dde3ee;
+    --red:#c0392b; --green:#1a7a4a; --orange:#d47a1a; --blue:#1a4a9c;
+    --shadow:0 4px 24px rgba(10,22,40,0.12);
+    --shadow-lg:0 12px 48px rgba(10,22,40,0.18);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Source Sans 3',sans-serif;background:var(--cream);color:var(--text-dark);min-height:100vh;display:flex;flex-direction:column;}
+
+  /* ── LOGIN PAGE ── */
+  #loginPage{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 50%,#0d1f44 100%);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;}
+  #loginPage.hidden{display:none;}
+  .login-box{background:var(--white);border-radius:16px;padding:40px 36px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.4);border-top:4px solid var(--gold);}
+  .login-emblem{width:72px;height:72px;background:radial-gradient(circle,var(--gold-light) 0%,var(--gold) 60%,#a07020 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:var(--navy);margin:0 auto 14px;border:3px solid var(--gold-light);box-shadow:0 0 24px rgba(200,150,42,0.5);}
+  .login-college{font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:var(--navy);text-align:center;line-height:1.3;margin-bottom:4px;}
+  .login-sub{font-size:11.5px;color:var(--text-muted);text-align:center;margin-bottom:26px;}
+  .login-label{font-size:11.5px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:6px;}
+  .login-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:11px 14px;font-family:'Source Sans 3',sans-serif;font-size:14px;color:var(--text-dark);background:var(--cream);margin-bottom:14px;transition:border-color 0.2s;}
+  .login-input:focus{outline:none;border-color:var(--gold);background:var(--white);}
+  .login-btn{width:100%;background:var(--navy);color:var(--gold-light);border:none;border-radius:8px;padding:12px;font-family:'Source Sans 3',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:4px;letter-spacing:0.3px;}
+  .login-btn:hover{background:var(--navy-light);box-shadow:0 4px 16px rgba(10,22,40,0.3);}
+  .login-error{background:#f8d7da;color:var(--red);border:1px solid #f5c6cb;border-radius:6px;padding:9px 13px;font-size:13px;margin-bottom:14px;display:none;text-align:center;}
+  .login-error.show{display:block;}
+  .login-footer{margin-top:20px;text-align:center;font-size:11.5px;color:var(--text-muted);}
+  #appWrapper{display:flex;flex-direction:column;flex:1;}
+  #appWrapper.hidden{display:none;}
+  .logout-btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.8);border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+  .logout-btn:hover{background:rgba(255,255,255,0.22);color:#fff;}
+
+  /* ── PROFILE AVATAR BUTTON ── */
+  .profile-avatar-btn{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle,var(--gold-light) 0%,var(--gold) 70%);border:2px solid var(--gold-light);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:var(--navy);flex-shrink:0;transition:all 0.2s;box-shadow:0 0 12px rgba(200,150,42,0.4);position:relative;}
+  .profile-avatar-btn:hover{transform:scale(1.08);box-shadow:0 0 20px rgba(200,150,42,0.6);}
+  .profile-avatar-btn .online-dot{position:absolute;bottom:1px;right:1px;width:10px;height:10px;background:#2ecc71;border-radius:50%;border:2px solid var(--navy);}
+
+  /* ── PROFILE OVERLAY ── */
+  #profileOverlay{position:fixed;inset:0;background:rgba(10,22,40,0.35);z-index:500;display:none;}
+  #profileOverlay.open{display:block;}
+  #profilePanel{position:fixed;top:0;right:0;width:270px;height:100%;overflow-y:auto;background:var(--white);z-index:501;box-shadow:-4px 0 24px rgba(10,22,40,0.18);border-left:1px solid var(--border);display:none;flex-direction:column;}
+  #profilePanel.open{display:flex;}
+
+  .pp-header{background:linear-gradient(160deg,var(--navy) 0%,var(--navy-mid) 60%,#0d1f44 100%);padding:24px 18px 18px;position:relative;}
+  .pp-close{position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.12);border:none;color:rgba(255,255,255,0.75);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;}
+  .pp-close:hover{background:rgba(255,255,255,0.25);color:#fff;}
+  .pp-avatar{width:58px;height:58px;border-radius:50%;background:radial-gradient(circle,var(--gold-light) 0%,var(--gold) 70%);display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:var(--navy);border:2px solid var(--gold-light);box-shadow:0 0 14px rgba(200,150,42,0.4);margin-bottom:10px;position:relative;}
+  .pp-avatar .pp-online{position:absolute;bottom:2px;right:2px;width:13px;height:13px;background:#2ecc71;border-radius:50%;border:2px solid var(--navy);}
+  .pp-name{font-family:'Libre Baskerville',serif;font-size:17px;font-weight:700;color:var(--gold-light);margin-bottom:2px;}
+  .pp-role{font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:0.3px;}
+  .pp-dept{display:inline-block;margin-top:7px;background:var(--gold);color:var(--navy);font-size:10px;font-weight:700;padding:2px 9px;border-radius:12px;letter-spacing:0.4px;}
+
+  /* Panel Body */
+  .pp-body{flex:1;overflow-y:auto;padding:10px 0;}
+  .pp-section-label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;padding:14px 20px 6px;}
+  .pp-item{display:flex;align-items:center;gap:13px;padding:12px 20px;cursor:pointer;transition:background 0.15s;border:none;background:none;width:100%;text-align:left;}
+  .pp-item:hover{background:var(--cream);}
+  .pp-item:active{background:#e8edf8;}
+  .pp-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .pp-item-text{flex:1;}
+  .pp-item-title{font-size:13.5px;font-weight:600;color:var(--text-dark);line-height:1.2;}
+  .pp-item-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+  .pp-chevron{font-size:12px;color:var(--text-muted);}
+  .pp-divider{height:1px;background:var(--border);margin:6px 20px;}
+
+  /* Panel Footer */
+  .pp-footer{padding:14px 20px;border-top:1px solid var(--border);}
+  .pp-logout-btn{width:100%;background:var(--red);color:#fff;border:none;border-radius:8px;padding:11px;font-family:'Source Sans 3',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .pp-logout-btn:hover{background:#a93226;box-shadow:0 4px 12px rgba(192,57,43,0.35);}
+
+  /* ── FEEDBACK MODAL ── */
+  #feedbackModal{position:fixed;inset:0;background:rgba(10,22,40,0.55);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+  #feedbackModal.open{opacity:1;pointer-events:all;}
+  .feedback-box{background:var(--white);border-radius:14px;padding:28px;width:90%;max-width:440px;box-shadow:0 20px 60px rgba(10,22,40,0.25);border-top:4px solid var(--gold);transform:scale(0.95);transition:transform 0.2s;}
+  #feedbackModal.open .feedback-box{transform:scale(1);}
+  .fb-title{font-family:'Libre Baskerville',serif;font-size:18px;color:var(--navy);margin-bottom:4px;}
+  .fb-sub{font-size:12px;color:var(--text-muted);margin-bottom:18px;}
+  .fb-stars{display:flex;gap:8px;margin-bottom:16px;}
+  .fb-star{font-size:28px;cursor:pointer;transition:transform 0.15s;color:#ddd;user-select:none;}
+  .fb-star.active,.fb-star:hover{color:var(--gold);transform:scale(1.15);}
+  .fb-label{font-size:11.5px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;}
+  .fb-textarea{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 13px;font-family:'Source Sans 3',sans-serif;font-size:13.5px;color:var(--text-dark);resize:vertical;min-height:90px;background:var(--cream);}
+  .fb-textarea:focus{outline:none;border-color:var(--gold);background:var(--white);}
+  .fb-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .fb-tag{background:var(--cream);border:1.5px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;color:var(--text-mid);transition:all 0.15s;font-weight:600;}
+  .fb-tag.active,.fb-tag:hover{background:var(--navy);color:var(--gold-light);border-color:var(--navy);}
+  .fb-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end;}
+
+  /* ── SERVICE MODAL ── */
+  #serviceModal{position:fixed;inset:0;background:rgba(10,22,40,0.55);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+  #serviceModal.open{opacity:1;pointer-events:all;}
+  .service-box{background:var(--white);border-radius:14px;padding:0;width:90%;max-width:460px;box-shadow:0 20px 60px rgba(10,22,40,0.25);border-top:4px solid var(--navy);overflow:hidden;transform:scale(0.95);transition:transform 0.2s;}
+  #serviceModal.open .service-box{transform:scale(1);}
+  .service-header{background:var(--navy);padding:18px 22px;}
+  .service-title{font-family:'Libre Baskerville',serif;font-size:17px;color:var(--gold-light);}
+  .service-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:3px;}
+  .service-body{padding:18px 22px;}
+  .service-item{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--border);}
+  .service-item:last-child{border-bottom:none;}
+  .si-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .si-text{flex:1;}
+  .si-name{font-size:13.5px;font-weight:700;color:var(--text-dark);}
+  .si-desc{font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+  .si-status{font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;}
+  .si-active{background:#d4edda;color:var(--green);}
+  .si-info{background:#e3eaff;color:#2a4b9c);}
+
+  /* ── PROFILE EDIT MODAL ── */
+  #profileEditModal{position:fixed;inset:0;background:rgba(10,22,40,0.55);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+  #profileEditModal.open{opacity:1;pointer-events:all;}
+  .pe-box{background:var(--white);border-radius:14px;padding:24px;width:90%;max-width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(10,22,40,0.25);border-top:4px solid var(--gold);transform:scale(0.95);transition:transform 0.2s;}
+  #profileEditModal.open .pe-box{transform:scale(1);}
+
+  header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,#0d1f44 100%);border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:100;box-shadow:var(--shadow-lg);}
+  .header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 14px;flex-wrap:nowrap;}
+  .emblem{width:44px;height:44px;background:radial-gradient(circle,var(--gold-light) 0%,var(--gold) 60%,#a07020 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:var(--navy);flex-shrink:0;border:2px solid var(--gold-light);box-shadow:0 0 14px rgba(200,150,42,0.35);}
+  .college-info{flex:1;min-width:0;}
+  .college-name{font-family:'Libre Baskerville',serif;font-size:13px;font-weight:700;color:var(--gold-light);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .college-sub{font-size:9.5px;color:rgba(255,255,255,0.5);letter-spacing:0.3px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dept-badge{display:none;}
+  .profile-avatar-btn{width:38px;height:38px;border-radius:50%;background:radial-gradient(circle,var(--gold-light) 0%,var(--gold) 70%);border:2px solid var(--gold-light);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:14px;font-weight:700;color:var(--navy);flex-shrink:0;position:relative;box-shadow:0 0 10px rgba(200,150,42,0.4);}
+  .profile-avatar-btn .online-dot{position:absolute;bottom:1px;right:1px;width:9px;height:9px;background:#2ecc71;border-radius:50%;border:2px solid var(--navy);}
+
+  nav{background:var(--navy-light);border-bottom:1px solid rgba(200,150,42,0.2);}
+  .nav-inner{max-width:1400px;margin:0 auto;display:flex;padding:0 24px;overflow-x:auto;}
+  .nav-btn{background:none;border:none;color:rgba(255,255,255,0.65);font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;padding:11px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
+  .nav-btn:hover{color:var(--gold-light);}
+  .nav-btn.active{color:var(--gold-light);border-bottom-color:var(--gold);background:rgba(200,150,42,0.08);}
+
+  main{max-width:1400px;margin:0 auto;padding:24px;width:100%;flex:1;}
+  .section{display:none;animation:fadeIn 0.25s ease;}
+  .section.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+  .page-title{font-family:'Libre Baskerville',serif;font-size:21px;color:var(--navy);border-left:4px solid var(--gold);padding-left:12px;}
+  .page-subtitle{font-size:12.5px;color:var(--text-muted);margin-top:3px;padding-left:16px;}
+
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:13px;margin-bottom:22px;}
+  .stat-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+  .stat-card.s-total::before{background:var(--navy);}
+  .stat-card.s-working::before{background:var(--green);}
+  .stat-card.s-broken::before{background:var(--red);}
+  .stat-card.s-partial::before{background:var(--orange);}
+  .stat-card.s-repair::before{background:#9b59b6;}
+  .stat-card.s-val::before{background:var(--blue);}
+  .stat-icon{font-size:22px;margin-bottom:5px;}
+  .stat-num{font-family:'Libre Baskerville',serif;font-size:26px;font-weight:700;color:var(--navy);line-height:1;}
+  .stat-label{font-size:11.5px;color:var(--text-muted);margin-top:3px;}
+
+  .card{background:var(--white);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;}
+  .card-header{background:var(--navy);color:var(--white);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .card-title{font-family:'Libre Baskerville',serif;font-size:14px;color:var(--gold-light);}
+  .card-body{padding:18px;}
+
+  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px;}
+  .form-group{display:flex;flex-direction:column;gap:5px;}
+  .form-group label{font-size:11.5px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.4px;}
+  .form-group input,.form-group select,.form-group textarea{border:1.5px solid var(--border);border-radius:6px;padding:8px 11px;font-family:'Source Sans 3',sans-serif;font-size:13.5px;color:var(--text-dark);background:var(--cream);transition:border-color 0.2s;width:100%;}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--gold);background:var(--white);}
+  .form-group textarea{resize:vertical;min-height:62px;}
+
+  .btn{border:none;border-radius:6px;padding:8px 17px;font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+  .btn-primary{background:var(--navy);color:var(--gold-light);}
+  .btn-primary:hover{background:var(--navy-light);}
+  .btn-gold{background:var(--gold);color:var(--navy);}
+  .btn-gold:hover{background:var(--gold-light);}
+  .btn-danger{background:var(--red);color:#fff;}
+  .btn-danger:hover{background:#a93226;}
+  .btn-outline{background:transparent;border:1.5px solid var(--navy);color:var(--navy);}
+  .btn-outline:hover{background:var(--navy);color:#fff;}
+  .btn-sm{padding:4px 10px;font-size:11.5px;}
+  .btn-row{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap;}
+
+  .table-wrapper{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead tr{background:var(--navy);}
+  thead th{color:var(--gold-light);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:10px 12px;text-align:left;white-space:nowrap;}
+  tbody tr{border-bottom:1px solid var(--border);transition:background 0.15s;}
+  tbody tr:hover{background:rgba(200,150,42,0.05);}
+  tbody td{padding:9px 12px;color:var(--text-dark);vertical-align:middle;}
+
+  .badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700;letter-spacing:0.2px;}
+  .bw{background:#d4edda;color:var(--green);}
+  .bnw{background:#f8d7da;color:var(--red);}
+  .bpart{background:#fff3cd;color:var(--orange);}
+  .brep{background:#e8d5f5;color:#7b2d8b;}
+  .bdisp{background:#e2e8f0;color:#475569;}
+  .bissued{background:#fff3e0;color:#b45309;}
+  .breturned{background:#e8f5e9;color:#2e7d32;}
+
+  .status-tabs{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;}
+  .status-tab{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:5px 14px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--text-mid);transition:all 0.18s;}
+  .status-tab.active{background:var(--navy);color:var(--gold-light);border-color:var(--navy);}
+  .status-tab.tw.active{background:var(--green);border-color:var(--green);color:#fff;}
+  .status-tab.tp.active{background:var(--orange);border-color:var(--orange);color:#fff;}
+  .status-tab.tr.active{background:#9b59b6;border-color:#9b59b6;color:#fff;}
+  .status-tab.tb.active{background:var(--red);border-color:var(--red);color:#fff;}
+
+  .search-bar{display:flex;gap:9px;align-items:center;margin-bottom:13px;flex-wrap:wrap;}
+  .search-bar input,.search-bar select{border:1.5px solid var(--border);border-radius:6px;padding:7px 11px;font-family:'Source Sans 3',sans-serif;font-size:13px;background:var(--white);}
+  .search-bar input:focus,.search-bar select:focus{outline:none;border-color:var(--gold);}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:800px){.two-col{grid-template-columns:1fr;}}
+
+  .cond-bar{height:5px;border-radius:3px;background:var(--border);overflow:hidden;margin-top:3px;width:70px;}
+  .cond-fill{height:100%;border-radius:3px;}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,0.6);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:var(--white);border-radius:12px;box-shadow:var(--shadow-lg);padding:24px;min-width:320px;max-width:520px;width:90%;border-top:4px solid var(--gold);transform:scale(0.96);transition:transform 0.2s;}
+  .modal-overlay.open .modal{transform:scale(1);}
+  .modal-title{font-family:'Libre Baskerville',serif;font-size:16px;color:var(--navy);margin-bottom:14px;}
+  .modal-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:18px;}
+
+  #toast{position:fixed;bottom:22px;right:22px;background:var(--navy);color:var(--gold-light);padding:11px 18px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);border-left:4px solid var(--gold);opacity:0;transform:translateY(10px);transition:all 0.3s;z-index:999;pointer-events:none;}
+  #toast.show{opacity:1;transform:none;}
+
+  .no-data{text-align:center;padding:26px;color:var(--text-muted);font-style:italic;font-size:13px;}
+  footer{text-align:center;padding:13px;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);background:var(--white);}
+  @media(max-width:600px){main{padding:12px;}.header-inner{padding:10px 14px;}.stats-grid{grid-template-columns:1fr 1fr;}.form-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- ════ LOGIN PAGE ════ -->
+<div id="loginPage">
+  <div class="login-box">
+    <div class="login-emblem">GDC</div>
+    <div class="login-college">Govt. Digvijay P.G. College<br>Rajnandgaon</div>
+    <div class="login-sub">Computer Department · Stock Management System</div>
+    <div class="login-error" id="loginError">❌ Invalid username or password</div>
+    <label class="login-label">Username</label>
+    <input type="text" class="login-input" id="loginUser" placeholder="Enter username" autocomplete="username">
+    <label class="login-label">Password</label>
+    <input type="password" class="login-input" id="loginPass" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">🔐 Login</button>
+    <div class="login-footer">Govt. Digvijay P.G. College · 2025–26</div>
+  </div>
+</div>
+
+<!-- ════ MAIN APP ════ -->
+<div id="appWrapper" class="hidden" style="display:none;flex-direction:column;flex:1;">
+<header>
+  <div class="header-inner">
+    <div class="emblem">GDC</div>
+    <div class="college-info">
+      <div class="college-name">Govt. Digvijay P.G. College, Rajnandgaon</div>
+      <div class="college-sub">Hemchand Yadav Vishwavidyalaya · Chhattisgarh</div>
+    </div>
+    <button class="profile-avatar-btn" onclick="openProfile()" title="My Profile">S<span class="online-dot"></span></button>
+  </div>
+  <nav>
+    <div class="nav-inner">
+      <button class="nav-btn active" onclick="showSection('dashboard')">🏠 Dashboard</button>
+      <button class="nav-btn" onclick="showSection('equipment')">💻 Equipment</button>
+      <button class="nav-btn" onclick="showSection('add-item')">➕ Add Equipment</button>
+      <button class="nav-btn" onclick="showSection('issue')">📤 Issue / Return</button>
+      <button class="nav-btn" onclick="showSection('transactions')">📋 Transactions</button>
+      <button class="nav-btn" onclick="showSection('maintenance')">🔧 Maintenance</button>
+      <button class="nav-btn" onclick="showSection('reports')">📊 Reports</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+<!-- ════ DASHBOARD ════ -->
+<div class="section active" id="sec-dashboard">
+  <div class="page-header">
+    <div><div class="page-title">Dashboard</div><div class="page-subtitle">Computer Department · Govt. Digvijay College · 2025–26</div></div>
+    <button class="btn btn-outline btn-sm" onclick="refreshDashboard()">🔄 Refresh</button>
+  </div>
+  <div class="stats-grid" id="statsGrid"></div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header"><span class="card-title">❌ Not Working / 🔧 Under Repair</span></div>
+      <div class="card-body" id="brokenList"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">🕐 Recent Activity</span></div>
+      <div class="card-body" id="recentList"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📊 Equipment Summary by Type</span></div>
+    <div class="card-body" style="padding:0">
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Equipment Type</th><th>Total Units</th><th>✅ Working</th><th>⚠ Partial</th><th>🔧 Repair</th><th>❌ Not Working</th><th>Working %</th></tr></thead>
+          <tbody id="summaryBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ EQUIPMENT STATUS ════ -->
+<div class="section" id="sec-equipment">
+  <div class="page-header">
+    <div><div class="page-title">Equipment Status Register</div><div class="page-subtitle">All assets with working / not-working status</div></div>
+    <button class="btn btn-gold" onclick="showSection('add-item')">➕ Add Equipment</button>
+  </div>
+  <div class="status-tabs">
+    <button class="status-tab active" onclick="setEqFilter('',event)">All</button>
+    <button class="status-tab tw" onclick="setEqFilter('Working',event)">✅ Working</button>
+    <button class="status-tab tp" onclick="setEqFilter('Partially Working',event)">⚠ Partially Working</button>
+    <button class="status-tab tr" onclick="setEqFilter('Under Repair',event)">🔧 Under Repair</button>
+    <button class="status-tab tb" onclick="setEqFilter('Not Working',event)">❌ Not Working</button>
+    <button class="status-tab" onclick="setEqFilter('Disposed',event)">🗑 Disposed</button>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="eqSearch" placeholder="🔍  Search name, asset tag, location..." oninput="renderEquipment()">
+    <select id="eqTypeFilter" onchange="renderEquipment()">
+      <option value="">All Types</option>
+    </select>
+    <select id="eqLabFilter" onchange="renderEquipment()">
+      <option value="">All Locations</option>
+      <option>Computer Lab 1</option><option>Computer Lab 2</option><option>Computer Lab 3</option>
+      <option>HOD Office</option><option>Faculty Room</option><option>Server Room</option>
+      <option>Classroom</option><option>Reception</option>
+    </select>
+  </div>
+  <div class="card">
+    <div class="card-body" style="padding:0">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Asset Tag</th><th>Equipment Name</th><th>Type</th><th>Brand / Model</th>
+              <th>Location</th><th>Total Qty</th><th>✅ Working</th><th>❌ Not Working</th>
+              <th>Status</th><th>Last Checked</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="equipmentBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ADD EQUIPMENT ════ -->
+<div class="section" id="sec-add-item">
+  <div class="page-header">
+    <div><div class="page-title" id="addItemTitle">Add New Equipment</div><div class="page-subtitle">Register computer department asset</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📝 Equipment Details</span></div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Asset Tag / Code *</label><input type="text" id="fCode" placeholder="e.g. COMP-001"></div>
+        <div class="form-group"><label>Equipment Name *</label><input type="text" id="fName" placeholder="e.g. Dell Desktop CPU"></div>
+        <div class="form-group">
+          <label>Equipment Type *</label>
+          <select id="fType">
+            <option value="">Select Type</option>
+            <option>CPU / Desktop</option><option>Monitor</option><option>Laptop</option>
+            <option>Mouse</option><option>Keyboard</option><option>Printer</option>
+            <option>Projector</option><option>Air Conditioner</option><option>UPS</option>
+            <option>Scanner</option><option>Webcam</option><option>Headphone / Speaker</option>
+            <option>Networking Equipment</option><option>Pen Drive / Storage</option>
+            <option>Power Strip / Extension</option><option>CCTV Camera</option>
+            <option>Stabilizer / Inverter</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Brand / Manufacturer</label><input type="text" id="fBrand" placeholder="e.g. Dell, HP, Lenovo"></div>
+        <div class="form-group"><label>Model Number</label><input type="text" id="fModel" placeholder="Model no."></div>
+        <div class="form-group"><label>Serial Number</label><input type="text" id="fSerial" placeholder="Serial / SN"></div>
+        <div class="form-group"><label>Total Quantity *</label><input type="number" id="fQty" placeholder="0" min="1" oninput="autoWorkingQty()"></div>
+        <div class="form-group"><label>✅ Working Quantity</label><input type="number" id="fWorkingQty" placeholder="0" min="0"></div>
+        <div class="form-group">
+          <label>Location / Lab *</label>
+          <select id="fLocation">
+            <option value="">Select Location</option>
+            <option>Computer Lab 1</option><option>Computer Lab 2</option><option>Computer Lab 3</option>
+            <option>HOD Office</option><option>Faculty Room</option><option>Server Room</option>
+            <option>Classroom</option><option>Reception</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Working Status *</label>
+          <select id="fStatus">
+            <option value="Working">✅ Working</option>
+            <option value="Partially Working">⚠ Partially Working</option>
+            <option value="Under Repair">🔧 Under Repair</option>
+            <option value="Not Working">❌ Not Working</option>
+            <option value="Disposed">🗑 Disposed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Physical Condition</label>
+          <select id="fCondition"><option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option><option>Scrap</option></select>
+        </div>
+        <div class="form-group"><label>Purchase Date</label><input type="date" id="fPurchaseDate"></div>
+        <div class="form-group"><label>Rate per Unit (₹)</label><input type="number" id="fRate" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="form-group"><label>Supplier / Vendor</label><input type="text" id="fSupplier" placeholder="Supplier name"></div>
+        <div class="form-group"><label>Invoice / Bill No.</label><input type="text" id="fInvoice" placeholder="Invoice number"></div>
+        <div class="form-group"><label>Warranty (months)</label><input type="number" id="fWarranty" placeholder="e.g. 12" min="0"></div>
+        <div class="form-group"><label>Last Checked Date</label><input type="date" id="fLastChecked"></div>
+      </div>
+      <div class="form-group" style="margin-top:13px">
+        <label>Remarks / Fault Description</label>
+        <textarea id="fRemarks" placeholder="Describe any faults, issues, or notes..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveItem()">💾 Save Equipment</button>
+        <button class="btn btn-outline" onclick="clearAddForm()">✖ Clear</button>
+        <button class="btn btn-outline" onclick="showSection('equipment')">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ISSUE / RETURN ════ -->
+<div class="section" id="sec-issue">
+  <div class="page-header">
+    <div><div class="page-title">Issue / Return Equipment</div><div class="page-subtitle">Track who is using which equipment</div></div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header"><span class="card-title">📤 Issue Equipment</span></div>
+      <div class="card-body">
+        <div class="form-group" style="margin-bottom:11px">
+          <label>Select Equipment *</label>
+          <select id="iItem" onchange="onIssueItemSelect()"><option value="">— Select Equipment —</option></select>
+        </div>
+        <div id="iItemInfo" style="display:none;background:var(--cream);border-radius:6px;padding:9px;margin-bottom:11px;font-size:12.5px;"></div>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="form-group"><label>Issued To *</label><input type="text" id="iIssuedTo" placeholder="Name"></div>
+          <div class="form-group"><label>Designation</label><input type="text" id="iDes" placeholder="Prof. / Student / Staff"></div>
+          <div class="form-group"><label>Issue Date</label><input type="date" id="iDate"></div>
+          <div class="form-group"><label>Expected Return</label><input type="date" id="iReturnDate"></div>
+          <div class="form-group" style="grid-column:1/-1"><label>Purpose</label><input type="text" id="iPurpose" placeholder="Purpose of use"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="issueItem()">📤 Issue</button>
+          <button class="btn btn-outline btn-sm" onclick="clearIssueForm()">Clear</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">📥 Return Equipment</span></div>
+      <div class="card-body">
+        <div class="form-group" style="margin-bottom:11px">
+          <label>Select Pending Issue *</label>
+          <select id="rTxn"><option value="">— Select Transaction —</option></select>
+        </div>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="form-group"><label>Return Date</label><input type="date" id="rDate"></div>
+          <div class="form-group">
+            <label>Condition on Return</label>
+            <select id="rCondition">
+              <option>Working</option><option>Partially Working</option><option>Damaged / Not Working</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:10px"><label>Remarks</label><textarea id="rRemarks" style="min-height:50px" placeholder="Return notes..."></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-gold" onclick="returnItem()">📥 Record Return</button>
+          <button class="btn btn-outline btn-sm" onclick="clearReturnForm()">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ TRANSACTIONS ════ -->
+<div class="section" id="sec-transactions">
+  <div class="page-header">
+    <div><div class="page-title">Transaction Register</div><div class="page-subtitle">Complete issue and return history</div></div>
+    <button class="btn btn-outline btn-sm" onclick="exportTxns()">⬇ Export CSV</button>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="txSearch" placeholder="🔍  Search..." oninput="renderTransactions()">
+    <select id="txTypeFilter" onchange="renderTransactions()"><option value="">All</option><option value="issued">Issued</option><option value="returned">Returned</option></select>
+  </div>
+  <div class="card">
+    <div class="card-body" style="padding:0">
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Txn ID</th><th>Date</th><th>Equipment</th><th>Type</th><th>Issued To</th><th>Purpose</th><th>Condition</th><th>Remarks</th></tr></thead>
+          <tbody id="txBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MAINTENANCE ════ -->
+<div class="section" id="sec-maintenance">
+  <div class="page-header">
+    <div><div class="page-title">Maintenance Log</div><div class="page-subtitle">Record repairs, servicing, and status changes</div></div>
+    <button class="btn btn-primary" onclick="openMaintModal()">🔧 Add Entry</button>
+  </div>
+  <div class="card">
+    <div class="card-body" style="padding:0">
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Date</th><th>Equipment</th><th>Issue Reported</th><th>Action Taken</th><th>By / Vendor</th><th>Cost (₹)</th><th>New Status</th><th>Next Service</th></tr></thead>
+          <tbody id="maintBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ REPORTS ════ -->
+<div class="section" id="sec-reports">
+  <div class="page-header">
+    <div><div class="page-title">Reports</div><div class="page-subtitle">Computer Department asset analytics</div></div>
+    <button class="btn btn-outline btn-sm" onclick="exportReport()">⬇ Export Full Report</button>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header"><span class="card-title">✅ Working Equipment</span></div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrapper">
+          <table><thead><tr><th>Equipment</th><th>Type</th><th>Location</th><th>Working Qty</th><th>Value (₹)</th></tr></thead><tbody id="rptWorkingBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">❌ Not Working / 🔧 Under Repair</span></div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrapper">
+          <table><thead><tr><th>Equipment</th><th>Type</th><th>Location</th><th>Status</th><th>Fault</th></tr></thead><tbody id="rptBrokenBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📍 Equipment by Location / Lab</span></div>
+    <div class="card-body" style="padding:0">
+      <div class="table-wrapper">
+        <table><thead><tr><th>Location</th><th>Total Items</th><th>✅ Working</th><th>❌ Not Working</th><th>🔧 Under Repair</th><th>Total Value (₹)</th></tr></thead><tbody id="rptLocationBody"></tbody></table>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📤 Pending Returns</span></div>
+    <div class="card-body" style="padding:0">
+      <div class="table-wrapper">
+        <table><thead><tr><th>Txn</th><th>Equipment</th><th>Issued To</th><th>Issue Date</th><th>Expected Return</th><th>Status</th></tr></thead><tbody id="rptPendingBody"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- MAINTENANCE MODAL -->
+<div class="modal-overlay" id="maintModal">
+  <div class="modal">
+    <div class="modal-title">🔧 Add Maintenance Entry</div>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:11px;">
+      <div class="form-group" style="grid-column:1/-1"><label>Equipment *</label><select id="mItem"><option value="">— Select —</option></select></div>
+      <div class="form-group"><label>Date *</label><input type="date" id="mDate"></div>
+      <div class="form-group"><label>Issue Reported *</label><input type="text" id="mIssue" placeholder="e.g. Screen not working"></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Action Taken</label><input type="text" id="mAction" placeholder="e.g. Replaced HDD, Cleaned"></div>
+      <div class="form-group"><label>By / Vendor</label><input type="text" id="mBy" placeholder="Name or company"></div>
+      <div class="form-group"><label>Cost (₹)</label><input type="number" id="mCost" placeholder="0" min="0"></div>
+      <div class="form-group">
+        <label>Update Status To</label>
+        <select id="mStatus">
+          <option value="">— No change —</option>
+          <option value="Working">✅ Working</option>
+          <option value="Partially Working">⚠ Partially Working</option>
+          <option value="Under Repair">🔧 Under Repair</option>
+          <option value="Not Working">❌ Not Working</option>
+          <option value="Disposed">🗑 Disposed</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Next Service Due</label><input type="date" id="mNextDue"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeMaintModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMaint()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-title">⚠ Confirm Delete</div>
+    <p style="color:var(--text-mid);font-size:14px;margin-bottom:6px;">Are you sure you want to delete this equipment record?</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS CHANGE MODAL -->
+<div class="modal-overlay" id="statusModal">
+  <div class="modal">
+    <div class="modal-title">🔄 Update Working Status</div>
+    <div id="statusModalInfo" style="font-size:13px;color:var(--text-mid);background:var(--cream);padding:10px;border-radius:6px;margin-bottom:13px;"></div>
+    <div class="form-group" style="margin-bottom:11px">
+      <label>New Working Status</label>
+      <select id="sNewStatus">
+        <option value="Working">✅ Working</option>
+        <option value="Partially Working">⚠ Partially Working</option>
+        <option value="Under Repair">🔧 Under Repair</option>
+        <option value="Not Working">❌ Not Working</option>
+        <option value="Disposed">🗑 Disposed</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:11px">
+      <label>Working Quantity (if partial)</label>
+      <input type="number" id="sWorkingQty" placeholder="Leave blank for auto" min="0">
+    </div>
+    <div class="form-group">
+      <label>Remark / Reason</label>
+      <input type="text" id="sRemark" placeholder="Reason for change...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeStatusModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmStatusChange()">Update Status</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<footer>Govt. Digvijay P.G. College, Rajnandgaon &nbsp;·&nbsp; Computer Department Stock Management System &nbsp;·&nbsp; Academic Year 2025–26</footer>
+</div><!-- end appWrapper -->
+
+<!-- ══════════════════════════════════════
+     PROFILE OVERLAY + PANEL
+══════════════════════════════════════ -->
+<div id="profileOverlay" onclick="closeProfile()"></div>
+<div id="profilePanel">
+  <!-- Header -->
+  <div class="pp-header">
+    <button class="pp-close" onclick="closeProfile()">✕</button>
+    <div class="pp-avatar">
+      S
+      <span class="pp-online"></span>
+    </div>
+    <div class="pp-name" id="ppName">Shreyash</div>
+    <div class="pp-role" id="ppRole">System Administrator</div>
+    <span class="pp-dept">💻 Computer Department</span>
+  </div>
+
+  <!-- Body -->
+  <div class="pp-body">
+    <div class="pp-section-label">Account</div>
+
+    <button class="pp-item" onclick="openProfileEdit()">
+      <div class="pp-icon" style="background:#e3eaff">👤</div>
+      <div class="pp-item-text">
+        <div class="pp-item-title">Edit Profile</div>
+        <div class="pp-item-sub">Update name, details & password</div>
+      </div>
+      <span class="pp-chevron">›</span>
+    </button>
+
+    <button class="pp-item" onclick="openProfileEdit()">
+      <div class="pp-icon" style="background:#fce4ec">🔐</div>
+      <div class="pp-item-text">
+        <div class="pp-item-title">Change Username / Password</div>
+        <div class="pp-item-sub">Update your login credentials</div>
+      </div>
+      <span class="pp-chevron">›</span>
+    </button>
+
+    <button class="pp-item" onclick="showSection('dashboard');closeProfile()">
+      <div class="pp-icon" style="background:#e8f5e9">🏠</div>
+      <div class="pp-item-text">
+        <div class="pp-item-title">Dashboard</div>
+        <div class="pp-item-sub">Go to main dashboard</div>
+      </div>
+      <span class="pp-chevron">›</span>
+    </button>
+
+    <div class="pp-divider"></div>
+    <div class="pp-section-label">Support & Services</div>
+
+    <button class="pp-item" onclick="openFeedback()">
+      <div class="pp-icon" style="background:#fff3cd">⭐</div>
+      <div class="pp-item-text">
+        <div class="pp-item-title">Feedback</div>
+        <div class="pp-item-sub">Rate and share your experience</div>
+      </div>
+      <span class="pp-chevron">›</span>
+    </button>
+
+    <button class="pp-item" onclick="openService()">
+      <div class="pp-icon" style="background:#f3e8ff">🔧</div>
+      <div class="pp-item-text">
+        <div class="pp-item-title">Services & System Info</div>
+        <div class="pp-item-sub">View active modules and status</div>
+      </div>
+      <span class="pp-chevron">›</span>
+    </button>
+
+    <button class="pp-item" onclick="openHelp()">
+      <div class="pp-icon" style="background:#e0f2fe">❓</div>
+      <div class="pp-item-text">
+        <div class="pp-item-title">Help & Guide</div>
+        <div class="pp-item-sub">How to use this system</div>
+      </div>
+      <span class="pp-chevron">›</span>
+    </button>
+
+    <div class="pp-divider"></div>
+    <div class="pp-section-label">System</div>
+
+    <button class="pp-item" onclick="exportReport();closeProfile()">
+      <div class="pp-icon" style="background:#fce4ec">📊</div>
+      <div class="pp-item-text">
+        <div class="pp-item-title">Export Full Report</div>
+        <div class="pp-item-sub">Download equipment CSV</div>
+      </div>
+      <span class="pp-chevron">›</span>
+    </button>
+
+    <button class="pp-item" id="ppLoginTime">
+      <div class="pp-icon" style="background:#f1f5f9">🕐</div>
+      <div class="pp-item-text">
+        <div class="pp-item-title">Session Info</div>
+        <div class="pp-item-sub" id="ppLoginTimeText">Logged in just now</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- Footer logout -->
+  <div class="pp-footer">
+    <button class="pp-logout-btn" onclick="doLogout()">
+      🚪 Logout
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     FEEDBACK MODAL
+══════════════════════════════════════ -->
+<div id="feedbackModal">
+  <div class="feedback-box">
+    <div class="fb-title">⭐ Share Your Feedback</div>
+    <div class="fb-sub">Help us improve the Stock Management System</div>
+
+    <div class="fb-label">Rate your experience</div>
+    <div class="fb-stars" id="fbStars">
+      <span class="fb-star" onclick="setRating(1)" data-val="1">★</span>
+      <span class="fb-star" onclick="setRating(2)" data-val="2">★</span>
+      <span class="fb-star" onclick="setRating(3)" data-val="3">★</span>
+      <span class="fb-star" onclick="setRating(4)" data-val="4">★</span>
+      <span class="fb-star" onclick="setRating(5)" data-val="5">★</span>
+    </div>
+
+    <div class="fb-label">What did you like?</div>
+    <div class="fb-tags" id="fbTags">
+      <span class="fb-tag" onclick="toggleTag(this)">Easy to Use</span>
+      <span class="fb-tag" onclick="toggleTag(this)">Good Design</span>
+      <span class="fb-tag" onclick="toggleTag(this)">Fast Performance</span>
+      <span class="fb-tag" onclick="toggleTag(this)">Useful Features</span>
+      <span class="fb-tag" onclick="toggleTag(this)">Status Tracking</span>
+      <span class="fb-tag" onclick="toggleTag(this)">Reports</span>
+    </div>
+
+    <div class="fb-label">Your comments</div>
+    <textarea class="fb-textarea" id="fbComment" placeholder="Write your feedback here..."></textarea>
+
+    <div class="fb-actions">
+      <button class="btn btn-outline" onclick="closeFeedback()">Cancel</button>
+      <button class="btn btn-gold" onclick="submitFeedback()">✉ Submit Feedback</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SERVICE MODAL
+══════════════════════════════════════ -->
+<div id="serviceModal">
+  <div class="service-box">
+    <div class="service-header">
+      <div class="service-title">🔧 Services & System Info</div>
+      <div class="service-sub">Computer Department Stock Management · v1.0</div>
+    </div>
+    <div class="service-body">
+      <div class="service-item">
+        <div class="si-icon" style="background:#e8f5e9">🏠</div>
+        <div class="si-text">
+          <div class="si-name">Dashboard Module</div>
+          <div class="si-desc">Stats, alerts, recent activity</div>
+        </div>
+        <span class="si-status si-active">Active</span>
+      </div>
+      <div class="service-item">
+        <div class="si-icon" style="background:#e3eaff">💻</div>
+        <div class="si-text">
+          <div class="si-name">Equipment Status Register</div>
+          <div class="si-desc">Working / Not Working tracking</div>
+        </div>
+        <span class="si-status si-active">Active</span>
+      </div>
+      <div class="service-item">
+        <div class="si-icon" style="background:#fff3cd">📤</div>
+        <div class="si-text">
+          <div class="si-name">Issue & Return Module</div>
+          <div class="si-desc">Equipment lending tracker</div>
+        </div>
+        <span class="si-status si-active">Active</span>
+      </div>
+      <div class="service-item">
+        <div class="si-icon" style="background:#f3e8ff">🔧</div>
+        <div class="si-text">
+          <div class="si-name">Maintenance Log</div>
+          <div class="si-desc">Repair & service history</div>
+        </div>
+        <span class="si-status si-active">Active</span>
+      </div>
+      <div class="service-item">
+        <div class="si-icon" style="background:#fce4ec">📊</div>
+        <div class="si-text">
+          <div class="si-name">Reports & CSV Export</div>
+          <div class="si-desc">Location-wise, status-wise reports</div>
+        </div>
+        <span class="si-status si-active">Active</span>
+      </div>
+      <div class="service-item">
+        <div class="si-icon" style="background:#f1f5f9">⚙️</div>
+        <div class="si-text">
+          <div class="si-name">Technology Stack</div>
+          <div class="si-desc">HTML5 · CSS3 · JavaScript (Vanilla)</div>
+        </div>
+        <span class="si-status" style="background:#e3eaff;color:#2a4b9c;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;">v1.0</span>
+      </div>
+    </div>
+    <div style="padding:14px 22px;border-top:1px solid var(--border);">
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="closeService()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PROFILE EDIT MODAL
+══════════════════════════════════════ -->
+<div id="profileEditModal">
+  <div class="pe-box">
+    <div style="font-family:'Libre Baskerville',serif;font-size:17px;color:var(--navy);margin-bottom:16px;">👤 Edit Profile</div>
+
+    <div class="form-group" style="margin-bottom:13px">
+      <label>Full Name</label>
+      <input type="text" id="peName" placeholder="Your name">
+    </div>
+    <div class="form-group" style="margin-bottom:13px">
+      <label>Designation / Role</label>
+      <input type="text" id="peRole" placeholder="e.g. Lab Assistant / HOD">
+    </div>
+    <div class="form-group" style="margin-bottom:13px">
+      <label>Email (optional)</label>
+      <input type="email" id="peEmail" placeholder="your@email.com">
+    </div>
+    <div class="form-group" style="margin-bottom:13px">
+      <label>Phone (optional)</label>
+      <input type="text" id="pePhone" placeholder="Mobile number">
+    </div>
+
+    <!-- Divider -->
+    <div style="height:1px;background:var(--border);margin:18px 0;"></div>
+    <div style="font-family:'Libre Baskerville',serif;font-size:15px;color:var(--navy);margin-bottom:14px;">🔐 Change Login Credentials</div>
+
+    <div class="form-group" style="margin-bottom:13px">
+      <label>Current Password *</label>
+      <div style="position:relative">
+        <input type="password" id="peCurrentPass" placeholder="Enter current password" style="padding-right:40px">
+        <span onclick="togglePassVis('peCurrentPass',this)" style="position:absolute;right:11px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:var(--text-muted)">👁</span>
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:13px">
+      <label>New Username</label>
+      <input type="text" id="peNewUser" placeholder="Leave blank to keep current">
+    </div>
+    <div class="form-group" style="margin-bottom:13px">
+      <label>New Password</label>
+      <div style="position:relative">
+        <input type="password" id="peNewPass" placeholder="Leave blank to keep current" style="padding-right:40px">
+        <span onclick="togglePassVis('peNewPass',this)" style="position:absolute;right:11px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:var(--text-muted)">👁</span>
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:13px">
+      <label>Confirm New Password</label>
+      <div style="position:relative">
+        <input type="password" id="peConfirmPass" placeholder="Re-enter new password" style="padding-right:40px">
+        <span onclick="togglePassVis('peConfirmPass',this)" style="position:absolute;right:11px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:var(--text-muted)">👁</span>
+      </div>
+    </div>
+
+    <!-- Current credentials display -->
+    <div style="background:var(--cream);border-radius:8px;padding:10px 13px;margin-bottom:4px;font-size:12px;color:var(--text-muted);border:1px solid var(--border)">
+      <div>Current Username: <b id="showCurrentUser" style="color:var(--navy)">shreyash</b></div>
+      <div style="margin-top:3px">Current Password: <b id="showCurrentPass" style="color:var(--navy)">••••••••••</b>
+        <span onclick="toggleShowCurrentPass()" style="cursor:pointer;color:var(--gold);font-size:11px;margin-left:6px">Show</span>
+      </div>
+    </div>
+
+    <div id="peError" style="display:none;background:#f8d7da;color:var(--red);border-radius:6px;padding:8px 12px;font-size:12.5px;margin-top:10px;"></div>
+
+    <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeProfileEdit()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProfile()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     HELP MODAL
+══════════════════════════════════════ -->
+<div id="helpModal" style="position:fixed;inset:0;background:rgba(10,22,40,0.55);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;">
+  <div style="background:var(--white);border-radius:14px;padding:0;width:90%;max-width:460px;box-shadow:0 20px 60px rgba(10,22,40,0.25);border-top:4px solid var(--gold);transform:scale(0.95);transition:transform 0.2s;max-height:85vh;overflow-y:auto;" id="helpBox">
+    <div style="background:var(--navy);padding:18px 22px;position:sticky;top:0;">
+      <div style="font-family:'Libre Baskerville',serif;font-size:17px;color:var(--gold-light);">❓ Help & Quick Guide</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:3px;">Computer Department Stock Management System</div>
+    </div>
+    <div style="padding:18px 22px;">
+      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">How to use this system:</div>
+      <div id="helpSteps"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:18px" onclick="closeHelp()">Got it!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════
+//  DATA
+// ═══════════════════════
+let items = [
+  { id:'E001',code:'CPU-001',name:'Dell OptiPlex 7010 Desktop CPU',type:'CPU / Desktop',brand:'Dell',model:'OptiPlex 7010',serial:'DL7010-001',qty:15,workingQty:12,location:'Computer Lab 1',status:'Partially Working',condition:'Good',purchaseDate:'2022-04-10',rate:32000,supplier:'DM Computers Rajnandgaon',invoice:'INV-0201',warranty:36,lastChecked:'2025-03-15',remarks:'3 CPUs have RAM issues — need replacement'},
+  { id:'E002',code:'CPU-002',name:'HP Compaq Pro 6300 Desktop CPU',type:'CPU / Desktop',brand:'HP',model:'Pro 6300',serial:'HP6300-001',qty:10,workingQty:8,location:'Computer Lab 2',status:'Partially Working',condition:'Fair',purchaseDate:'2021-06-15',rate:28000,supplier:'TechZone Raipur',invoice:'INV-0150',warranty:36,lastChecked:'2025-02-10',remarks:'2 units power supply failure'},
+  { id:'E003',code:'MON-001',name:'Samsung 19" LED Monitor',type:'Monitor',brand:'Samsung',model:'S19A330',serial:'SAM-MON-01',qty:20,workingQty:18,location:'Computer Lab 1',status:'Partially Working',condition:'Good',purchaseDate:'2022-04-10',rate:7500,supplier:'DM Computers Rajnandgaon',invoice:'INV-0202',warranty:12,lastChecked:'2025-03-15',remarks:'2 monitors have dim / flickering display'},
+  { id:'E004',code:'MON-002',name:'LG 21.5" FHD Monitor',type:'Monitor',brand:'LG',model:'22MP68VQ',serial:'LG-MON-01',qty:10,workingQty:10,location:'Computer Lab 2',status:'Working',condition:'Good',purchaseDate:'2023-01-20',rate:9200,supplier:'TechZone Raipur',invoice:'INV-0310',warranty:24,lastChecked:'2025-04-01',remarks:''},
+  { id:'E005',code:'LAP-001',name:'HP Pavilion 15 Laptop',type:'Laptop',brand:'HP',model:'Pavilion 15-eg',serial:'HPLAP-001',qty:5,workingQty:4,location:'HOD Office',status:'Partially Working',condition:'Good',purchaseDate:'2023-06-01',rate:48000,supplier:'TechZone Raipur',invoice:'INV-0401',warranty:24,lastChecked:'2025-03-01',remarks:'1 unit battery completely dead'},
+  { id:'E006',code:'MOU-001',name:'Logitech M90 Optical Mouse',type:'Mouse',brand:'Logitech',model:'M90',serial:'—',qty:30,workingQty:25,location:'Computer Lab 1',status:'Partially Working',condition:'Fair',purchaseDate:'2022-04-10',rate:350,supplier:'DM Computers Rajnandgaon',invoice:'INV-0203',warranty:12,lastChecked:'2025-03-20',remarks:'5 mice with broken scroll wheel'},
+  { id:'E007',code:'MOU-002',name:'Dell USB Mouse MS116',type:'Mouse',brand:'Dell',model:'MS116',serial:'—',qty:15,workingQty:15,location:'Computer Lab 2',status:'Working',condition:'Good',purchaseDate:'2023-01-20',rate:400,supplier:'TechZone Raipur',invoice:'INV-0311',warranty:12,lastChecked:'2025-04-01',remarks:''},
+  { id:'E008',code:'KEY-001',name:'HP USB Keyboard KU-1156',type:'Keyboard',brand:'HP',model:'KU-1156',serial:'—',qty:30,workingQty:28,location:'Computer Lab 1',status:'Partially Working',condition:'Good',purchaseDate:'2022-04-10',rate:450,supplier:'DM Computers Rajnandgaon',invoice:'INV-0204',warranty:12,lastChecked:'2025-03-15',remarks:'2 keyboards with broken/missing keys'},
+  { id:'E009',code:'KEY-002',name:'Lenovo USB Keyboard',type:'Keyboard',brand:'Lenovo',model:'KBD-STD',serial:'—',qty:10,workingQty:10,location:'Computer Lab 2',status:'Working',condition:'Good',purchaseDate:'2023-01-20',rate:480,supplier:'TechZone Raipur',invoice:'INV-0312',warranty:12,lastChecked:'2025-04-01',remarks:''},
+  { id:'E010',code:'PRJ-001',name:'Epson EB-S41 Projector',type:'Projector',brand:'Epson',model:'EB-S41',serial:'EPS-PRJ-01',qty:2,workingQty:1,location:'Classroom',status:'Partially Working',condition:'Fair',purchaseDate:'2021-08-01',rate:28500,supplier:'InfoTech Bhilai',invoice:'INV-0099',warranty:24,lastChecked:'2025-01-10',remarks:'1 unit lamp needs replacement — ordered'},
+  { id:'E011',code:'PRJ-002',name:'BenQ MW550 Projector',type:'Projector',brand:'BenQ',model:'MW550',serial:'BNQ-PRJ-02',qty:1,workingQty:0,location:'Computer Lab 3',status:'Not Working',condition:'Poor',purchaseDate:'2020-03-15',rate:32000,supplier:'InfoTech Bhilai',invoice:'INV-0045',warranty:24,lastChecked:'2025-02-20',remarks:'Display board damaged — sent to BenQ service center Raipur'},
+  { id:'E012',code:'AC-001',name:'Voltas 1.5 Ton Split AC',type:'Air Conditioner',brand:'Voltas',model:'183V CZP',serial:'VLT-AC-001',qty:3,workingQty:3,location:'Computer Lab 1',status:'Working',condition:'Good',purchaseDate:'2023-05-01',rate:38000,supplier:'Cool Point Rajnandgaon',invoice:'INV-0380',warranty:60,lastChecked:'2025-04-10',remarks:'Annual servicing completed April 2025'},
+  { id:'E013',code:'AC-002',name:'LG 1.5 Ton Inverter AC',type:'Air Conditioner',brand:'LG',model:'KS-Q18YNZA',serial:'LG-AC-002',qty:2,workingQty:1,location:'Computer Lab 2',status:'Under Repair',condition:'Fair',purchaseDate:'2022-05-10',rate:42000,supplier:'Cool Point Rajnandgaon',invoice:'INV-0270',warranty:60,lastChecked:'2025-03-05',remarks:'Compressor failure — at LG service center'},
+  { id:'E014',code:'UPS-001',name:'APC 600VA UPS',type:'UPS',brand:'APC',model:'BX600C-IN',serial:'APC-UPS-01',qty:20,workingQty:17,location:'Computer Lab 1',status:'Partially Working',condition:'Fair',purchaseDate:'2022-04-10',rate:3200,supplier:'DM Computers Rajnandgaon',invoice:'INV-0205',warranty:12,lastChecked:'2025-03-15',remarks:'3 UPS battery replacement required'},
+  { id:'E015',code:'PRN-001',name:'HP LaserJet Pro M15w',type:'Printer',brand:'HP',model:'M15w',serial:'HPPRN-001',qty:2,workingQty:2,location:'HOD Office',status:'Working',condition:'Good',purchaseDate:'2024-01-15',rate:12000,supplier:'TechZone Raipur',invoice:'INV-0501',warranty:12,lastChecked:'2025-03-30',remarks:''},
+  { id:'E016',code:'PRN-002',name:'Canon LBP6030 Printer',type:'Printer',brand:'Canon',model:'LBP6030',serial:'CAN-PRN-01',qty:1,workingQty:0,location:'Faculty Room',status:'Not Working',condition:'Poor',purchaseDate:'2019-07-01',rate:8500,supplier:'InfoTech Bhilai',invoice:'INV-0010',warranty:12,lastChecked:'2025-01-05',remarks:'Paper jam mechanism broken — beyond economical repair'},
+  { id:'E017',code:'SCN-001',name:'Epson GT-1500 Scanner',type:'Scanner',brand:'Epson',model:'GT-1500',serial:'EPS-SCN-01',qty:1,workingQty:1,location:'HOD Office',status:'Working',condition:'Good',purchaseDate:'2023-09-01',rate:15000,supplier:'InfoTech Bhilai',invoice:'INV-0450',warranty:12,lastChecked:'2025-04-01',remarks:''},
+  { id:'E018',code:'NET-001',name:'TP-Link 24-Port Network Switch',type:'Networking Equipment',brand:'TP-Link',model:'TL-SF1024',serial:'TPLINK-SW01',qty:2,workingQty:2,location:'Server Room',status:'Working',condition:'Good',purchaseDate:'2023-03-01',rate:4500,supplier:'TechZone Raipur',invoice:'INV-0350',warranty:24,lastChecked:'2025-04-01',remarks:''},
+];
+
+let transactions = [
+  {id:'T001',date:'2025-04-10',itemId:'E005',type:'issued',issuedTo:'Dr. A.K. Verma',designation:'Asst. Professor',returnDate:'2025-04-20',purpose:'Online exam invigilation',condition:'Working',remarks:'',returned:false},
+  {id:'T002',date:'2025-03-15',itemId:'E015',type:'issued',issuedTo:'Shri R. Gupta',designation:'Lab Attendant',returnDate:'2025-03-25',purpose:'Exam paper printing',condition:'Working',remarks:'',returned:true},
+  {id:'T003',date:'2025-03-25',itemId:'E015',type:'returned',issuedTo:'Shri R. Gupta',designation:'Lab Attendant',returnDate:'',purpose:'',condition:'Working',remarks:'Returned in good condition',returned:true},
+];
+
+let maintenance = [
+  {date:'2025-03-05',itemId:'E013',issue:'Compressor not cooling at all',action:'Sent to LG Authorized Service Center, Raipur',by:'LG Service Raipur',cost:0,newStatus:'Under Repair',nextDue:'2025-05-15'},
+  {date:'2025-02-20',itemId:'E011',issue:'No display output — projector starts but screen blank',action:'Diagnosis: Display board failure confirmed',by:'BenQ Authorized',cost:500,newStatus:'Not Working',nextDue:''},
+  {date:'2025-04-10',itemId:'E012',issue:'Annual preventive maintenance',action:'Filter cleaned, refrigerant recharged, fins straightened',by:'Cool Point Rajnandgaon',cost:1200,newStatus:'Working',nextDue:'2026-04-10'},
+];
+
+let eqFilter='';
+let editingId=null;
+let deletingId=null;
+let statusChangingId=null;
+let txCounter=transactions.length+1;
+
+const today=()=>new Date().toISOString().split('T')[0];
+const pad=(n,w=3)=>String(n).padStart(w,'0');
+const fmt=n=>Number(n||0).toLocaleString('en-IN');
+const getItem=id=>items.find(i=>i.id===id);
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+function statusBadge(s){
+  const m={'Working':'<span class="badge bw">✅ Working</span>','Partially Working':'<span class="badge bpart">⚠ Partially Working</span>','Under Repair':'<span class="badge brep">🔧 Under Repair</span>','Not Working':'<span class="badge bnw">❌ Not Working</span>','Disposed':'<span class="badge bdisp">🗑 Disposed</span>'};
+  return m[s]||s;
+}
+
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>{if(b.getAttribute('onclick').includes("'"+id+"'"))b.classList.add('active');});
+  if(id==='dashboard')refreshDashboard();
+  if(id==='equipment'){populateTypeFilter();renderEquipment();}
+  if(id==='add-item'){if(!editingId)clearAddForm();}
+  if(id==='issue')populateIssueDropdowns();
+  if(id==='transactions')renderTransactions();
+  if(id==='maintenance'){populateMaintSelect();renderMaintenance();}
+  if(id==='reports')renderReports();
+}
+
+// ════ DASHBOARD ════
+function refreshDashboard(){
+  const totalTypes=items.length;
+  const totalUnits=items.reduce((s,i)=>s+i.qty,0);
+  const working=items.filter(i=>i.status==='Working').length;
+  const partial=items.filter(i=>i.status==='Partially Working').length;
+  const repair=items.filter(i=>i.status==='Under Repair').length;
+  const broken=items.filter(i=>i.status==='Not Working').length;
+  const totalVal=items.reduce((s,i)=>s+i.qty*i.rate,0);
+
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stat-card s-total"><div class="stat-icon">💻</div><div class="stat-num">${totalTypes}</div><div class="stat-label">Equipment Types</div></div>
+    <div class="stat-card s-total"><div class="stat-icon">📦</div><div class="stat-num">${totalUnits}</div><div class="stat-label">Total Units</div></div>
+    <div class="stat-card s-working"><div class="stat-icon">✅</div><div class="stat-num">${working}</div><div class="stat-label">Fully Working Types</div></div>
+    <div class="stat-card s-partial"><div class="stat-icon">⚠</div><div class="stat-num">${partial}</div><div class="stat-label">Partially Working</div></div>
+    <div class="stat-card s-repair"><div class="stat-icon">🔧</div><div class="stat-num">${repair}</div><div class="stat-label">Under Repair</div></div>
+    <div class="stat-card s-broken"><div class="stat-icon">❌</div><div class="stat-num">${broken}</div><div class="stat-label">Not Working</div></div>
+    <div class="stat-card s-val"><div class="stat-icon">₹</div><div class="stat-num" style="font-size:19px">₹${fmt(totalVal)}</div><div class="stat-label">Total Asset Value</div></div>
+  `;
+
+  const problems=items.filter(i=>i.status!=='Working'&&i.status!=='Disposed');
+  const brEl=document.getElementById('brokenList');
+  if(!problems.length){brEl.innerHTML='<div class="no-data">✅ All equipment is working fine!</div>';}
+  else{brEl.innerHTML=problems.map(i=>`
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);gap:8px;">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px">${i.name}</div>
+        <div style="font-size:11.5px;color:var(--text-muted)">${i.location} · ${i.type}</div>
+        ${i.remarks?`<div style="font-size:11.5px;color:var(--orange);margin-top:2px">⚠ ${i.remarks}</div>`:''}
+        ${i.status==='Partially Working'?`<div style="font-size:11.5px;color:var(--green);margin-top:1px">✅ ${i.workingQty}/${i.qty} working</div>`:''}
+      </div>
+      <div style="flex-shrink:0">${statusBadge(i.status)}</div>
+    </div>`).join('');}
+
+  const rec=[...transactions].reverse().slice(0,5);
+  const rl=document.getElementById('recentList');
+  if(!rec.length){rl.innerHTML='<div class="no-data">No transactions yet</div>';return;}
+  rl.innerHTML=rec.map(t=>{const it=getItem(t.itemId);return`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-weight:600;font-size:13px">${it?.name||'—'}</div>
+        <div style="font-size:11.5px;color:var(--text-muted)">${t.issuedTo} · ${t.date}</div>
+      </div>
+      <span class="badge ${t.type==='issued'?'bissued':'breturned'}">${t.type==='issued'?'📤 Issued':'📥 Returned'}</span>
+    </div>`;}).join('');
+
+  // type summary
+  const types={};
+  items.forEach(i=>{
+    if(!types[i.type])types[i.type]={total:0,working:0,partial:0,repair:0,broken:0};
+    types[i.type].total+=i.qty;
+    if(i.status==='Working')types[i.type].working+=i.qty;
+    else if(i.status==='Partially Working'){types[i.type].working+=i.workingQty;types[i.type].partial+=(i.qty-i.workingQty);}
+    else if(i.status==='Under Repair')types[i.type].repair+=i.qty;
+    else if(i.status==='Not Working')types[i.type].broken+=i.qty;
+  });
+  document.getElementById('summaryBody').innerHTML=Object.entries(types).map(([type,v])=>{
+    const pct=v.total?Math.round(v.working/v.total*100):0;
+    const color=pct>=80?'var(--green)':pct>=50?'var(--orange)':'var(--red)';
+    return`<tr>
+      <td><b>${type}</b></td>
+      <td>${v.total}</td>
+      <td style="color:var(--green);font-weight:700">${v.working}</td>
+      <td style="color:var(--orange)">${v.partial}</td>
+      <td style="color:#9b59b6">${v.repair}</td>
+      <td style="color:var(--red)">${v.broken}</td>
+      <td><span style="color:${color};font-weight:700">${pct}%</span>
+        <div class="cond-bar"><div class="cond-fill" style="width:${pct}%;background:${color}"></div></div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ════ EQUIPMENT ════
+function setEqFilter(s,ev){
+  eqFilter=s;
+  document.querySelectorAll('.status-tab').forEach(t=>t.classList.remove('active'));
+  if(ev&&ev.target)ev.target.classList.add('active');
+  renderEquipment();
+}
+
+function populateTypeFilter(){
+  const types=[...new Set(items.map(i=>i.type))].sort();
+  const sel=document.getElementById('eqTypeFilter');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">All Types</option>'+types.map(t=>`<option>${t}</option>`).join('');
+  sel.value=cur;
+}
+
+function renderEquipment(){
+  const q=document.getElementById('eqSearch').value.toLowerCase();
+  const tf=document.getElementById('eqTypeFilter').value;
+  const lf=document.getElementById('eqLabFilter').value;
+  let filtered=items.filter(i=>{
+    const mq=!q||i.name.toLowerCase().includes(q)||i.code.toLowerCase().includes(q)||(i.brand||'').toLowerCase().includes(q)||i.location.toLowerCase().includes(q);
+    const mt=!tf||i.type===tf;
+    const ml=!lf||i.location===lf;
+    const ms=!eqFilter||i.status===eqFilter;
+    return mq&&mt&&ml&&ms;
+  });
+  const body=document.getElementById('equipmentBody');
+  if(!filtered.length){body.innerHTML=`<tr><td colspan="11" class="no-data">No equipment found</td></tr>`;return;}
+  body.innerHTML=filtered.map(i=>{
+    const notWorking=i.qty-i.workingQty;
+    const rowBg=i.status==='Not Working'?'background:#fff5f5':i.status==='Under Repair'?'background:#faf5ff':i.status==='Partially Working'?'background:#fffdf0':'';
+    return`<tr style="${rowBg}">
+      <td><code style="background:var(--cream);padding:2px 6px;border-radius:4px;font-size:11px">${i.code}</code></td>
+      <td>
+        <div style="font-weight:700">${i.name}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${i.brand||''} ${i.model||''} ${i.serial&&i.serial!=='—'?'· S/N: '+i.serial:''}</div>
+        ${i.remarks?`<div style="font-size:11px;color:var(--orange);margin-top:1px">⚠ ${i.remarks}</div>`:''}
+      </td>
+      <td style="font-size:12.5px">${i.type}</td>
+      <td style="font-size:12px">${i.brand||'—'} ${i.model?'<br><span style="color:var(--text-muted)">'+i.model+'</span>':''}</td>
+      <td><span class="badge" style="background:#e3eaff;color:#2a4b9c;font-size:10.5px">${i.location}</span></td>
+      <td style="font-weight:700;font-size:15px;text-align:center">${i.qty}</td>
+      <td style="text-align:center">
+        <span style="color:var(--green);font-weight:700;font-size:15px">${i.workingQty}</span>
+      </td>
+      <td style="text-align:center">
+        <span style="color:${notWorking>0?'var(--red)':'var(--text-muted)'};font-weight:${notWorking>0?'700':'400'};font-size:${notWorking>0?'15':'13'}px">${notWorking}</span>
+      </td>
+      <td>${statusBadge(i.status)}</td>
+      <td style="font-size:12px">${i.lastChecked||'—'}</td>
+      <td>
+        <button class="btn btn-sm btn-outline" onclick="openStatusModal('${i.id}')" style="margin-right:3px;margin-bottom:3px">🔄</button>
+        <button class="btn btn-sm btn-outline" onclick="editItem('${i.id}')" style="margin-right:3px;margin-bottom:3px">✏</button>
+        <button class="btn btn-sm btn-danger" onclick="openDeleteModal('${i.id}')">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ════ ADD / EDIT ════
+function autoWorkingQty(){
+  if(document.getElementById('fStatus').value==='Working'){
+    document.getElementById('fWorkingQty').value=document.getElementById('fQty').value;
+  }
+}
+
+function clearAddForm(){
+  editingId=null;
+  document.getElementById('addItemTitle').textContent='Add New Equipment';
+  ['fCode','fName','fBrand','fModel','fSerial','fRate','fSupplier','fInvoice','fWarranty','fRemarks'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fQty').value='';
+  document.getElementById('fWorkingQty').value='';
+  document.getElementById('fType').value='';document.getElementById('fLocation').value='';
+  document.getElementById('fStatus').value='Working';document.getElementById('fCondition').value='Good';
+  document.getElementById('fPurchaseDate').value=today();document.getElementById('fLastChecked').value=today();
+}
+
+function saveItem(){
+  const code=document.getElementById('fCode').value.trim();
+  const name=document.getElementById('fName').value.trim();
+  const type=document.getElementById('fType').value;
+  const loc=document.getElementById('fLocation').value;
+  const qty=parseInt(document.getElementById('fQty').value)||0;
+  const wqty=parseInt(document.getElementById('fWorkingQty').value)||0;
+  if(!code||!name||!type||!loc||!qty){showToast('⚠ Fill all required fields (*starred)');return;}
+  if(wqty>qty){showToast('⚠ Working qty cannot exceed total qty');return;}
+  const data={code,name,type,brand:document.getElementById('fBrand').value,model:document.getElementById('fModel').value,serial:document.getElementById('fSerial').value,qty,workingQty:wqty,location:loc,status:document.getElementById('fStatus').value,condition:document.getElementById('fCondition').value,purchaseDate:document.getElementById('fPurchaseDate').value,rate:parseFloat(document.getElementById('fRate').value)||0,supplier:document.getElementById('fSupplier').value,invoice:document.getElementById('fInvoice').value,warranty:parseInt(document.getElementById('fWarranty').value)||0,lastChecked:document.getElementById('fLastChecked').value,remarks:document.getElementById('fRemarks').value};
+  if(editingId){Object.assign(getItem(editingId),data);showToast('✅ Equipment updated');editingId=null;}
+  else{if(items.find(i=>i.code===code)){showToast('⚠ Asset tag already exists');return;}items.push({id:'E'+pad(items.length+1),...data});showToast('✅ Equipment added');}
+  clearAddForm();showSection('equipment');
+}
+
+function editItem(id){
+  editingId=id;const i=getItem(id);
+  document.getElementById('addItemTitle').textContent='Edit Equipment';
+  document.getElementById('fCode').value=i.code;document.getElementById('fName').value=i.name;
+  document.getElementById('fType').value=i.type;document.getElementById('fBrand').value=i.brand||'';
+  document.getElementById('fModel').value=i.model||'';document.getElementById('fSerial').value=i.serial||'';
+  document.getElementById('fQty').value=i.qty;document.getElementById('fWorkingQty').value=i.workingQty;
+  document.getElementById('fLocation').value=i.location;document.getElementById('fStatus').value=i.status;
+  document.getElementById('fCondition').value=i.condition;document.getElementById('fPurchaseDate').value=i.purchaseDate;
+  document.getElementById('fRate').value=i.rate;document.getElementById('fSupplier').value=i.supplier||'';
+  document.getElementById('fInvoice').value=i.invoice||'';document.getElementById('fWarranty').value=i.warranty||'';
+  document.getElementById('fLastChecked').value=i.lastChecked||'';document.getElementById('fRemarks').value=i.remarks||'';
+  showSection('add-item');
+}
+
+function openDeleteModal(id){deletingId=id;document.getElementById('deleteModal').classList.add('open');}
+function closeDeleteModal(){deletingId=null;document.getElementById('deleteModal').classList.remove('open');}
+function confirmDelete(){items=items.filter(i=>i.id!==deletingId);closeDeleteModal();showToast('🗑 Deleted');renderEquipment();}
+
+function openStatusModal(id){
+  statusChangingId=id;const item=getItem(id);
+  document.getElementById('statusModalInfo').innerHTML=`<b>${item.name}</b><br>Current status: ${statusBadge(item.status)} &nbsp; Working: <b>${item.workingQty}</b> / ${item.qty}`;
+  document.getElementById('sNewStatus').value=item.status;
+  document.getElementById('sWorkingQty').value=item.workingQty;
+  document.getElementById('sRemark').value='';
+  document.getElementById('statusModal').classList.add('open');
+}
+function closeStatusModal(){statusChangingId=null;document.getElementById('statusModal').classList.remove('open');}
+function confirmStatusChange(){
+  const ns=document.getElementById('sNewStatus').value;
+  const item=getItem(statusChangingId);
+  const old=item.status;
+  item.status=ns;
+  item.lastChecked=today();
+  const wq=parseInt(document.getElementById('sWorkingQty').value);
+  if(!isNaN(wq))item.workingQty=Math.min(wq,item.qty);
+  if(ns==='Working')item.workingQty=item.qty;
+  if(ns==='Not Working'||ns==='Disposed')item.workingQty=0;
+  maintenance.push({date:today(),itemId:statusChangingId,issue:`Status changed from "${old}" to "${ns}"`,action:document.getElementById('sRemark').value||'Status updated manually',by:'Dept. Admin',cost:0,newStatus:ns,nextDue:''});
+  closeStatusModal();showToast('🔄 Status updated to: '+ns);renderEquipment();
+}
+
+// ════ ISSUE / RETURN ════
+function populateIssueDropdowns(){
+  const iSel=document.getElementById('iItem');
+  iSel.innerHTML='<option value="">— Select Equipment —</option>'+items.filter(i=>i.status!=='Disposed'&&i.status!=='Not Working').map(i=>`<option value="${i.id}">[${i.code}] ${i.name} (${i.status})</option>`).join('');
+  const rSel=document.getElementById('rTxn');
+  const pend=transactions.filter(t=>t.type==='issued'&&!t.returned);
+  rSel.innerHTML='<option value="">— Select Transaction —</option>'+pend.map(t=>{const it=getItem(t.itemId);return`<option value="${t.id}">${t.id} · ${it?.name||'?'} → ${t.issuedTo} (${t.date})</option>`;}).join('');
+  document.getElementById('iDate').value=today();document.getElementById('rDate').value=today();
+}
+function onIssueItemSelect(){
+  const id=document.getElementById('iItem').value;
+  const info=document.getElementById('iItemInfo');
+  if(!id){info.style.display='none';return;}
+  const item=getItem(id);
+  info.innerHTML=`<b>${item.type}</b> · ${item.brand} ${item.model} · ${item.location} · Status: ${statusBadge(item.status)} · ✅ ${item.workingQty}/${item.qty} working`;
+  info.style.display='block';
+}
+function clearIssueForm(){document.getElementById('iItem').value='';document.getElementById('iItemInfo').style.display='none';['iIssuedTo','iDes','iReturnDate','iPurpose'].forEach(id=>document.getElementById(id).value='');document.getElementById('iDate').value=today();}
+function clearReturnForm(){document.getElementById('rTxn').value='';['rRemarks'].forEach(id=>document.getElementById(id).value='');document.getElementById('rDate').value=today();document.getElementById('rCondition').value='Working';}
+function issueItem(){
+  const itemId=document.getElementById('iItem').value;const issuedTo=document.getElementById('iIssuedTo').value.trim();
+  if(!itemId||!issuedTo){showToast('⚠ Select equipment and enter name');return;}
+  transactions.push({id:'T'+pad(++txCounter),date:document.getElementById('iDate').value||today(),itemId,type:'issued',issuedTo,designation:document.getElementById('iDes').value,returnDate:document.getElementById('iReturnDate').value,purpose:document.getElementById('iPurpose').value,condition:'Working',remarks:'',returned:false});
+  showToast('📤 Equipment issued');clearIssueForm();populateIssueDropdowns();
+}
+function returnItem(){
+  const txId=document.getElementById('rTxn').value;if(!txId){showToast('⚠ Select a transaction');return;}
+  const tx=transactions.find(t=>t.id===txId);tx.returned=true;
+  const cond=document.getElementById('rCondition').value;
+  transactions.push({id:'T'+pad(++txCounter),date:document.getElementById('rDate').value||today(),itemId:tx.itemId,type:'returned',issuedTo:tx.issuedTo,designation:tx.designation,returnDate:'',purpose:'',condition:cond,remarks:document.getElementById('rRemarks').value,returned:true});
+  if(cond==='Damaged / Not Working'){const item=getItem(tx.itemId);item.status='Not Working';item.workingQty=Math.max(0,item.workingQty-1);showToast('📥 Returned — marked Not Working');}
+  else showToast('📥 Return recorded');
+  clearReturnForm();populateIssueDropdowns();
+}
+
+// ════ TRANSACTIONS ════
+function renderTransactions(){
+  const q=document.getElementById('txSearch').value.toLowerCase();
+  const tf=document.getElementById('txTypeFilter').value;
+  let filtered=[...transactions].reverse().filter(t=>{
+    const it=getItem(t.itemId);
+    const mq=!q||(it?.name||'').toLowerCase().includes(q)||t.issuedTo.toLowerCase().includes(q)||t.id.toLowerCase().includes(q);
+    return mq&&(!tf||t.type===tf);
+  });
+  const body=document.getElementById('txBody');
+  if(!filtered.length){body.innerHTML=`<tr><td colspan="8" class="no-data">No transactions</td></tr>`;return;}
+  body.innerHTML=filtered.map(t=>{const it=getItem(t.itemId);return`<tr>
+    <td><code style="font-size:11px">${t.id}</code></td>
+    <td>${t.date}</td>
+    <td>${it?.name||'—'}<div style="font-size:11px;color:var(--text-muted)">${it?.code||''}</div></td>
+    <td><span class="badge ${t.type==='issued'?'bissued':'breturned'}">${t.type==='issued'?'📤 Issued':'📥 Returned'}</span></td>
+    <td>${t.issuedTo}${t.designation?`<div style="font-size:11px;color:var(--text-muted)">${t.designation}</div>`:''}</td>
+    <td style="font-size:12px">${t.purpose||'—'}</td>
+    <td style="font-size:12px">${t.condition||'—'}</td>
+    <td style="font-size:12px;max-width:140px">${t.remarks||'—'}</td>
+  </tr>`;}).join('');
+}
+function exportTxns(){
+  const h=['Txn ID','Date','Equipment','Code','Type','Issued To','Designation','Purpose','Condition','Remarks'];
+  const r=transactions.map(t=>{const it=getItem(t.itemId);return[t.id,t.date,it?.name||'',it?.code||'',t.type,t.issuedTo,t.designation||'',t.purpose||'',t.condition||'',t.remarks||''];});
+  const csv=[h,...r].map(r=>r.map(c=>'"'+(c||'').toString().replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='transactions_CS_Dept.csv';a.click();showToast('⬇ Exported');
+}
+
+// ════ MAINTENANCE ════
+function populateMaintSelect(){
+  document.getElementById('mItem').innerHTML='<option value="">— Select —</option>'+items.map(i=>`<option value="${i.id}">[${i.code}] ${i.name}</option>`).join('');
+  document.getElementById('mDate').value=today();
+}
+function openMaintModal(){populateMaintSelect();document.getElementById('maintModal').classList.add('open');}
+function closeMaintModal(){document.getElementById('maintModal').classList.remove('open');}
+function saveMaint(){
+  const itemId=document.getElementById('mItem').value;const issue=document.getElementById('mIssue').value.trim();
+  if(!itemId||!issue){showToast('⚠ Select equipment and describe issue');return;}
+  const ns=document.getElementById('mStatus').value;
+  if(ns){const item=getItem(itemId);item.status=ns;item.lastChecked=today();if(ns==='Working')item.workingQty=item.qty;if(ns==='Not Working'||ns==='Disposed')item.workingQty=0;}
+  maintenance.push({date:document.getElementById('mDate').value||today(),itemId,issue,action:document.getElementById('mAction').value,by:document.getElementById('mBy').value,cost:parseFloat(document.getElementById('mCost').value)||0,newStatus:ns||'—',nextDue:document.getElementById('mNextDue').value});
+  closeMaintModal();renderMaintenance();showToast('🔧 Maintenance entry saved');
+  ['mItem','mIssue','mAction','mBy','mCost','mNextDue'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mStatus').value='';
+}
+function renderMaintenance(){
+  const body=document.getElementById('maintBody');
+  if(!maintenance.length){body.innerHTML=`<tr><td colspan="8" class="no-data">No records</td></tr>`;return;}
+  body.innerHTML=[...maintenance].reverse().map(m=>{const it=getItem(m.itemId);return`<tr>
+    <td>${m.date}</td>
+    <td>${it?.name||'—'}<div style="font-size:11px;color:var(--text-muted)">${it?.code||''} · ${it?.location||''}</div></td>
+    <td style="color:var(--red);font-size:12.5px">${m.issue}</td>
+    <td style="font-size:12.5px">${m.action||'—'}</td>
+    <td style="font-size:12.5px">${m.by||'—'}</td>
+    <td>${m.cost?'₹'+fmt(m.cost):'—'}</td>
+    <td>${m.newStatus&&m.newStatus!=='—'?statusBadge(m.newStatus):'—'}</td>
+    <td style="font-size:12px">${m.nextDue||'—'}</td>
+  </tr>`;}).join('');
+}
+
+// ════ REPORTS ════
+function renderReports(){
+  const working=items.filter(i=>i.status==='Working');
+  document.getElementById('rptWorkingBody').innerHTML=working.map(i=>`<tr><td><b>${i.name}</b></td><td>${i.type}</td><td>${i.location}</td><td style="color:var(--green);font-weight:700">${i.qty}</td><td>₹${fmt(i.qty*i.rate)}</td></tr>`).join('')||`<tr><td colspan="5" class="no-data">None</td></tr>`;
+
+  const broken=items.filter(i=>['Not Working','Under Repair','Partially Working'].includes(i.status));
+  document.getElementById('rptBrokenBody').innerHTML=broken.map(i=>`<tr style="${i.status==='Not Working'?'background:#fff5f5':''}"><td><b>${i.name}</b></td><td>${i.type}</td><td>${i.location}</td><td>${statusBadge(i.status)}</td><td style="font-size:12px;color:var(--red)">${i.remarks||'—'}</td></tr>`).join('')||`<tr><td colspan="5" class="no-data">✅ All working!</td></tr>`;
+
+  const locs={};
+  items.forEach(i=>{
+    if(!locs[i.location])locs[i.location]={total:0,working:0,broken:0,repair:0,val:0};
+    locs[i.location].total+=i.qty;locs[i.location].val+=i.qty*i.rate;
+    if(i.status==='Working')locs[i.location].working+=i.qty;
+    else if(i.status==='Not Working')locs[i.location].broken+=i.qty;
+    else if(i.status==='Under Repair')locs[i.location].repair+=i.qty;
+    else if(i.status==='Partially Working'){locs[i.location].working+=i.workingQty;locs[i.location].broken+=(i.qty-i.workingQty);}
+  });
+  document.getElementById('rptLocationBody').innerHTML=Object.entries(locs).map(([loc,v])=>`<tr><td><b>${loc}</b></td><td>${v.total}</td><td style="color:var(--green);font-weight:600">${v.working}</td><td style="color:var(--red)">${v.broken}</td><td style="color:#9b59b6">${v.repair}</td><td>₹${fmt(v.val)}</td></tr>`).join('');
+
+  const pend=transactions.filter(t=>t.type==='issued'&&!t.returned);
+  document.getElementById('rptPendingBody').innerHTML=pend.map(t=>{const it=getItem(t.itemId);const ov=t.returnDate&&t.returnDate<today();return`<tr style="${ov?'background:#fff5f5':''}"><td><code style="font-size:11px">${t.id}</code></td><td>${it?.name||'—'}</td><td>${t.issuedTo}</td><td>${t.date}</td><td>${t.returnDate||'—'}${ov?' <span class="badge bnw" style="font-size:10px">Overdue</span>':''}</td><td>${statusBadge(it?.status||'Working')}</td></tr>`;}).join('')||`<tr><td colspan="6" class="no-data">✅ No pending returns</td></tr>`;
+}
+
+function exportReport(){
+  const h=['Asset Tag','Name','Type','Brand','Model','Location','Total Qty','Working Qty','Not Working','Status','Condition','Purchase Date','Rate','Total Value','Last Checked','Remarks'];
+  const r=items.map(i=>[i.code,i.name,i.type,i.brand||'',i.model||'',i.location,i.qty,i.workingQty,i.qty-i.workingQty,i.status,i.condition,i.purchaseDate,i.rate,i.qty*i.rate,i.lastChecked||'',i.remarks||'']);
+  const csv=[h,...r].map(r=>r.map(c=>'"'+(c||'').toString().replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='equipment_report_CS_Dept.csv';a.click();showToast('⬇ Report exported');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{refreshDashboard();populateTypeFilter();});
+
+function doLogin(){
+  const user=document.getElementById('loginUser').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginError');
+  if(user===credentials.username&&pass===credentials.password){
+    err.classList.remove('show');
+    document.getElementById('loginPage').classList.add('hidden');
+    const app=document.getElementById('appWrapper');
+    app.style.display='flex';
+    loginTime = new Date();
+    refreshDashboard();populateTypeFilter();
+  } else {
+    err.classList.add('show');
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginPass').focus();
+  }
+}
+
+function doLogout(){
+  closeProfile();
+  setTimeout(()=>{
+    document.getElementById('appWrapper').style.display='none';
+    document.getElementById('loginPage').classList.remove('hidden');
+    document.getElementById('loginUser').value='';
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginError').classList.remove('show');
+  },250);
+}
+
+// ── PROFILE PANEL ──
+let loginTime = null;
+let userProfile = { name:'Shreyash', role:'System Administrator', email:'', phone:'' };
+let credentials = { username:'shreyash', password:'shreyash1930' };
+let fbRating = 0;
+
+function openProfile(){
+  // update session info
+  if(loginTime){
+    const mins = Math.floor((new Date()-loginTime)/60000);
+    const txt = mins < 1 ? 'Logged in just now' : mins < 60 ? `Logged in ${mins} min ago` : `Logged in ${Math.floor(mins/60)}h ${mins%60}m ago`;
+    document.getElementById('ppLoginTimeText').textContent = txt;
+  }
+  document.getElementById('ppName').textContent = userProfile.name;
+  document.getElementById('ppRole').textContent = userProfile.role;
+  document.getElementById('profilePanel').classList.add('open');
+  document.getElementById('profileOverlay').classList.add('open');
+}
+function closeProfile(){
+  document.getElementById('profilePanel').classList.remove('open');
+  document.getElementById('profileOverlay').classList.remove('open');
+}
+
+// ── FEEDBACK ──
+function openFeedback(){
+  closeProfile();
+  fbRating = 0;
+  document.getElementById('fbComment').value='';
+  document.querySelectorAll('.fb-star').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.fb-tag').forEach(t=>t.classList.remove('active'));
+  document.getElementById('feedbackModal').classList.add('open');
+}
+function closeFeedback(){ document.getElementById('feedbackModal').classList.remove('open'); }
+function setRating(n){
+  fbRating = n;
+  document.querySelectorAll('.fb-star').forEach(s=>{
+    s.classList.toggle('active', parseInt(s.dataset.val) <= n);
+  });
+}
+function toggleTag(el){ el.classList.toggle('active'); }
+function submitFeedback(){
+  if(!fbRating){ showToast('⭐ Please give a star rating first'); return; }
+  const tags = [...document.querySelectorAll('.fb-tag.active')].map(t=>t.textContent).join(', ');
+  const comment = document.getElementById('fbComment').value.trim();
+  closeFeedback();
+  showToast(`✅ Thank you for your ${fbRating}★ feedback!`);
+  console.log('Feedback:', { rating: fbRating, tags, comment });
+}
+
+// ── SERVICE ──
+function openService(){ closeProfile(); document.getElementById('serviceModal').classList.add('open'); }
+function closeService(){ document.getElementById('serviceModal').classList.remove('open'); }
+
+// ── PROFILE EDIT ──
+function openProfileEdit(){
+  closeProfile();
+  document.getElementById('peName').value = userProfile.name;
+  document.getElementById('peRole').value = userProfile.role;
+  document.getElementById('peEmail').value = userProfile.email;
+  document.getElementById('pePhone').value = userProfile.phone;
+  document.getElementById('peCurrentPass').value='';
+  document.getElementById('peNewUser').value='';
+  document.getElementById('peNewPass').value='';
+  document.getElementById('peConfirmPass').value='';
+  document.getElementById('showCurrentUser').textContent = credentials.username;
+  document.getElementById('showCurrentPass').textContent = '••••••••••';
+  document.getElementById('peError').style.display='none';
+  document.getElementById('profileEditModal').classList.add('open');
+}
+function closeProfileEdit(){ document.getElementById('profileEditModal').classList.remove('open'); }
+
+function togglePassVis(inputId, eyeEl){
+  const inp = document.getElementById(inputId);
+  if(inp.type==='password'){ inp.type='text'; eyeEl.textContent='🙈'; }
+  else { inp.type='password'; eyeEl.textContent='👁'; }
+}
+
+function toggleShowCurrentPass(){
+  const el = document.getElementById('showCurrentPass');
+  el.textContent = el.textContent==='••••••••••' ? credentials.password : '••••••••••';
+}
+
+function saveProfile(){
+  const name = document.getElementById('peName').value.trim();
+  const errEl = document.getElementById('peError');
+  errEl.style.display='none';
+
+  if(!name){ errEl.textContent='⚠ Name cannot be empty'; errEl.style.display='block'; return; }
+
+  // Handle credentials change
+  const currentPass = document.getElementById('peCurrentPass').value;
+  const newUser     = document.getElementById('peNewUser').value.trim();
+  const newPass     = document.getElementById('peNewPass').value;
+  const confirmPass = document.getElementById('peConfirmPass').value;
+
+  const wantsCredChange = currentPass || newUser || newPass || confirmPass;
+
+  if(wantsCredChange){
+    if(!currentPass){ errEl.textContent='⚠ Enter your current password to change credentials'; errEl.style.display='block'; return; }
+    if(currentPass !== credentials.password){ errEl.textContent='❌ Current password is incorrect'; errEl.style.display='block'; return; }
+    if(newPass && newPass !== confirmPass){ errEl.textContent='❌ New passwords do not match'; errEl.style.display='block'; return; }
+    if(newPass && newPass.length < 4){ errEl.textContent='⚠ New password must be at least 4 characters'; errEl.style.display='block'; return; }
+    if(newUser) credentials.username = newUser;
+    if(newPass) credentials.password = newPass;
+    showToast('🔐 Login credentials updated!');
+  }
+
+  // Save profile info
+  userProfile.name  = name;
+  userProfile.role  = document.getElementById('peRole').value.trim() || userProfile.role;
+  userProfile.email = document.getElementById('peEmail').value.trim();
+  userProfile.phone = document.getElementById('pePhone').value.trim();
+
+  closeProfileEdit();
+  if(!wantsCredChange) showToast('✅ Profile updated successfully!');
+}
+
+// ── HELP ──
+function openHelp(){
+  closeProfile();
+  const steps = [
+    ['💻','Equipment Register','Go to "Equipment" tab to see all assets. Use status filter tabs to view Working / Not Working items.'],
+    ['➕','Add Equipment','Click "Add Equipment" to register new assets. Fill in the form with asset tag, type, location, and working status.'],
+    ['🔄','Update Status','In Equipment list, click the 🔄 button on any row to quickly change its working status.'],
+    ['📤','Issue Equipment','Go to "Issue / Return" tab → Issue panel. Select equipment, enter person name, and click Issue.'],
+    ['📥','Return Equipment','In "Issue / Return" → Return panel. Select the pending transaction and record the return condition.'],
+    ['🔧','Maintenance','Go to "Maintenance" tab → click "Add Entry" to log a repair with cost, vendor, and updated status.'],
+    ['📊','Reports','Go to "Reports" to see Working/Broken lists, Lab-wise summary, and Pending Returns.'],
+    ['⬇','Export CSV','In Transactions or Reports sections, click the export button to download a CSV file.'],
+  ];
+  document.getElementById('helpSteps').innerHTML = steps.map(s=>`
+    <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start">
+      <div style="width:36px;height:36px;background:var(--cream);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${s[0]}</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px">${s[1]}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${s[2]}</div>
+      </div>
+    </div>`).join('');
+  const modal = document.getElementById('helpModal');
+  modal.style.opacity='0';modal.style.pointerEvents='none';
+  modal.style.display='flex';
+  setTimeout(()=>{ modal.style.opacity='1';modal.style.pointerEvents='all'; document.getElementById('helpBox').style.transform='scale(1)'; },10);
+}
+function closeHelp(){
+  const modal = document.getElementById('helpModal');
+  modal.style.opacity='0';modal.style.pointerEvents='none';
+}
+</script>
+</body>
+</html>
